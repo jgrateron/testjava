@@ -39,14 +39,12 @@ public class ManejoExcepcionesSilenciosas {
 		listaClientes.add(new Cliente(1, "Cliente 1"));
 		listaClientes.add(new Cliente(2, "Cliente 2"));
 
-		app.actualizarRegistro(listaClientes, new Cliente(200, "Cliente 200"));
-
 		try {
-			app.actualizarRegistro(listaClientes, new Cliente(10, "Cliente 10"));			
+			app.actualizarRegistro(listaClientes, new Cliente(200, "Cliente 200"));
 		} catch (NoEncontradoException | IdIncorrectoException e) {
 			e.printStackTrace();
 		}
+
+		app.actualizarRegistro(listaClientes, new Cliente(10, "Cliente 10"));
 	}
 }
-
-
