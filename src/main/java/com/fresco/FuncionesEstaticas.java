@@ -3,7 +3,15 @@ package com.fresco;
 import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
+import java.util.ArrayList;
+
 public class FuncionesEstaticas {
+
+	public static <T> void nonNullExec(T obj, Runnable action) {
+		if (nonNull(obj)) {
+			action.run();
+		}
+	}
 
 	public static void main(String[] args) {
 
@@ -27,10 +35,14 @@ public class FuncionesEstaticas {
 			}
 		}
 		System.out.println("encontrado: " + encontrado);
+		var lista = new ArrayList<String>();
+		nonNullExec(b, () -> {
+			lista.add(b);
+		});
+		
 	}
 
 	public static boolean not(boolean expresion) {
 		return !expresion;
 	}
 }
-
