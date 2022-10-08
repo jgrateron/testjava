@@ -1,17 +1,16 @@
 package com.fresco;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.stream.Stream;
 
 public class ClockTime {
 	public static void main(String[] args) {
-		Stream.of(args)
-		.map(ZoneId.SHORT_IDS::get)
-		.map(ZoneId::of)
-		.map(ZonedDateTime::now)
-		.map(time -> time.format(DateTimeFormatter.ofPattern("E, dd MMM u hh:mm:ss a z")))
-		.forEach(System.out::println);
+
+		var now = Instant.now().atZone(ZoneId.of("America/Caracas"));
+		System.out.println(now);
+		
+		var ahora = LocalDateTime.now().atZone(ZoneId.of("America/Lima"));
+		System.out.println(ahora);
 	}
 }
