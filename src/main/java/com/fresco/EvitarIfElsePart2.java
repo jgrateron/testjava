@@ -35,16 +35,16 @@ public class EvitarIfElsePart2 {
 			System.err.println("Operación no soportada: " + funcion);
 		}
 	}
-	public Function<Operandos, Integer> sum = (Operandos oper) -> {
+	public Function<Operandos, Integer> sum = oper -> {
 		return oper.a + oper.b;
 	};
-	public Function<Operandos, Integer> rest = (Operandos oper) -> {
+	public Function<Operandos, Integer> rest = oper -> {
 		return oper.a - oper.b;
 	};
-	public Function<Operandos, Integer> mult = (Operandos oper) -> {
+	public Function<Operandos, Integer> mult = oper -> {
 		return oper.a * oper.b;
 	};
-	public Function<Operandos, Integer> divi = (Operandos oper) -> {
+	public Function<Operandos, Integer> divi = oper -> {
 		return oper.a / oper.b;
 	};
 }
