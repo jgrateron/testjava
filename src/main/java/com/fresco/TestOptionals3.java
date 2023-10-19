@@ -32,7 +32,7 @@ public class TestOptionals3 {
 			var codigo = Optional.ofNullable(pe)
 								.flatMap(Persona::getDireccion)
 					            .flatMap(Direccion::getPais)
-					            .flatMap(Pais::getCodigo)
+					            .map(Pais::codigo)
 					            .orElse("No existe codigo");
 			System.out.println(codigo);
 		}
