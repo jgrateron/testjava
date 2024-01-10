@@ -1,7 +1,6 @@
 package com.fresco;
 
 import java.util.Set;
-import static com.fresco.Debug.println;
 
 public class Conjuntos {
 	public static void main(String[] args) {
