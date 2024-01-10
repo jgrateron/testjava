@@ -1,6 +1,7 @@
 package com.fresco;
 
-import java.util.Arrays;
+import java.io.ByteArrayOutputStream;
+import java.util.stream.IntStream;
 
 public class Bin2Text {
 
@@ -18,11 +19,21 @@ public class Bin2Text {
 		return sb.toString();
 	}
 
+	public static void combiner(ByteArrayOutputStream a, ByteArrayOutputStream b) {
+	}
+
 	public static String binaryToText(String binary) {
-		return Arrays.stream(binary.replaceAll(" ", "").split("(?<=\\G.{8})"))/* regex to split the bits array by 8 */
-				.map(eightBits -> (char) Integer.parseInt(eightBits, 2)) // transforma
-				.collect(StringBuilder::new, StringBuilder::append, StringBuilder::append) // collect
-				.toString();
+		var partition = 8;
+		var groups = binary.length() / partition;
+		var res = IntStream.range(0, groups)
+				.mapToObj(i -> {
+					var ini = i * partition;
+					var end = ini + partition;
+					return binary.substring(ini, end);
+				})
+				.map(s -> Integer.parseInt(s, 2))
+				.collect(ByteArrayOutputStream::new, ByteArrayOutputStream::write, Bin2Text::combiner);
+		return new String(res.toByteArray());
 	}
 
 }
