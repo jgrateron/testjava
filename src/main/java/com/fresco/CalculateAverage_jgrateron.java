@@ -157,11 +157,13 @@ public class CalculateAverage_jgrateron {
         private final RandomAccessFile rFile;
         private long maxRead;
         private Map<ByteBuffer, Medicion> mediciones = new HashMap<>();
+        private ByteBuffer byteBuffer;
 
         public MiTarea(File file, Particion particion) throws IOException {
             rFile = new RandomAccessFile(file, "r");
             maxRead = particion.size;
             rFile.seek(particion.offset);
+            byteBuffer = ByteBuffer.allocate(MAX_LENGTH_LINE);
         }
 
         @Override
@@ -245,17 +247,20 @@ public class CalculateAverage_jgrateron {
          */
         public void updateMediciones(byte data[], int pos, int semicolon) {
             var temp = strToInt(data, pos, semicolon);
-            var estacion = new byte[semicolon];
-            System.arraycopy(data, pos, estacion, 0, semicolon);
-            var byteBuffer = ByteBuffer.wrap(estacion);
+            byteBuffer.put(data, pos, semicolon);
+            byteBuffer.flip();            
             var medicion = mediciones.get(byteBuffer);
             if (medicion == null) {
+                var estacion = new byte[semicolon];
+                System.arraycopy(data, pos, estacion, 0, semicolon);
+                var newByteBuffer = ByteBuffer.wrap(estacion);
                 medicion = new Medicion(estacion, 1, temp, temp, temp);
-                mediciones.put(byteBuffer, medicion);
+                mediciones.put(newByteBuffer, medicion);
             }
             else {
                 medicion.update(1, temp, temp, temp);
             }
+            byteBuffer.clear();
         }
 
         /*
