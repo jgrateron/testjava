@@ -5,7 +5,6 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Locale;
@@ -233,7 +232,7 @@ public class Desafio1BR6 {
 
         @Override
         public String toString() {
-            return new String(buffer.array());
+            return new String(buffer.array(), 0, buffer.limit());
         }
     }
 }
