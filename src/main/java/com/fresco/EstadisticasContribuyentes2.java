@@ -6,11 +6,8 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EstadisticasContribuyentes {
+public class EstadisticasContribuyentes2 {
 	public static String FILE = "contribuyentes.txt";
-
-	public record Contribuyente(String numRuc, String indEstado, String indCondicion) {
-	}
 
 	public static void main(String[] args) throws IOException {
 		var ini = System.nanoTime();
@@ -22,10 +19,6 @@ public class EstadisticasContribuyentes {
 
 	public static void procesar() throws IOException {
 		var result = Files.lines(Path.of(FILE)).parallel()//
-				.map(s -> {
-					var arr = s.split("\\|", 3);
-					return new Contribuyente(arr[0], arr[1], arr[2]);
-				})
 				.collect(ResumenContribuyente::new, ResumenContribuyente::accumulator, ResumenContribuyente::combiner);
 		System.out.println(result.count);
 		result.groupEstado.entrySet().stream()//
@@ -51,17 +44,18 @@ public class EstadisticasContribuyentes {
 			groupCondicion = new HashMap<String, Entero>();
 		}
 
-		public void accumulator(Contribuyente contribuyente) {
+		public void accumulator(String linea) {
 			count++;
-			var cuantosXEstado = groupEstado.get(contribuyente.indEstado);
+			var arr = linea.split("\\|", 3);
+			var cuantosXEstado = groupEstado.get(arr[1]);
 			if (cuantosXEstado == null) {
-				groupEstado.put(contribuyente.indEstado, new Entero(1));
+				groupEstado.put(arr[1], new Entero(1));
 			} else {
 				cuantosXEstado.inc(1);
 			}
-			var cuantosXCondicion = groupCondicion.get(contribuyente.indCondicion);
+			var cuantosXCondicion = groupCondicion.get(arr[2]);
 			if (cuantosXCondicion == null) {
-				groupCondicion.put(contribuyente.indCondicion, new Entero(1));
+				groupCondicion.put(arr[2], new Entero(1));
 			} else {
 				cuantosXCondicion.inc(1);
 			}
