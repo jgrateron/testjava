@@ -2,19 +2,19 @@ package com.fresco;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import com.fresco.parse.Entero;
+import com.fresco.parse.IProcessor;
 import com.fresco.parse.Index;
 import com.fresco.parse.SplitFile;
 
-public class EstadisticasContribuyentes5 {
+public class EstadisticasContribuyentes6 {
+
 	public static String FILE = "contribuyentes.txt";
 
 	public static void main(String[] args) throws IOException {
-		procesar();
-		procesar();
 		var ini = System.nanoTime();
 		procesar();
 		var end = System.nanoTime();
@@ -28,61 +28,101 @@ public class EstadisticasContribuyentes5 {
 		result.show();
 	}
 
-	public static class ResumenContribuyente {
+	public static class ResumenContribuyente implements IProcessor<ResumenContribuyente> {
+		private static final byte separator = '|';
 		private int count;
+		private int countBytes;
 		private Map<Index, Entero> groupEstado;
 		private Map<Index, Entero> groupCondicion;
 		private Index index;
+		private ByteBuffer estado;
+		private ByteBuffer condicion;
+		private int hashCode1;
+		private int hashCode2;
 
 		public ResumenContribuyente() {
 			count = 0;
-			groupEstado = new TreeMap<Index, Entero>();
-			groupCondicion = new TreeMap<Index, Entero>();
+			countBytes = 0;
+			groupEstado = new HashMap<Index, Entero>();
+			groupCondicion = new HashMap<Index, Entero>();
 			index = new Index();
+			estado = ByteBuffer.allocate(2);
+			condicion = ByteBuffer.allocate(2);
 		}
 
+		@Override
 		public void acumular(SplitFile sf) {
-			sf.setSeparator('|');
-			sf.setMaxRecord(3);
+			sf.setProcessor(this);
 			for (;;) {
-				var linea = sf.getLine();
-				if (linea == null) {
+				var continuar = sf.processLine();
+				if (!continuar) {
 					break;
 				}
-				acumular(linea);
+				acumular();
 			}
 		}
 
-		public void acumular(ByteBuffer[] records) {
+		@Override
+		public boolean processLine(ByteBuffer bb, long size) {
+			if (countBytes < size) {
+				var b = bb.get(countBytes++);
+				while (b != separator) {
+					b = bb.get(countBytes++);
+				}
+				while (b != separator)
+					;
+				estado.clear();
+				hashCode1 = 0;
+				b = bb.get(countBytes++);
+				do {
+					estado.put(b);
+					hashCode1 = hashCode1 * 31 + b;
+					b = bb.get(countBytes++);
+				} while (b != separator);
+				estado.flip();
+				condicion.clear();
+				hashCode2 = 0;
+				b = bb.get(countBytes++);
+				do {
+					condicion.put(b);
+					hashCode2 = hashCode2 * 31 + b;
+					b = bb.get(countBytes++);
+				} while (b != separator);
+				condicion.flip();
+				countBytes++;// enter
+				return true;
+			}
+			return false;
+		}
+
+		public void acumular() {
 			count++;
-			var estado = records[1];
-			index.setByteBuffer(estado);
+			index.setByteBuffer(estado, hashCode1);
 			var cuantosXEstado = groupEstado.get(index);
 			if (cuantosXEstado == null) {
 				var newEstado = ByteBuffer.allocate(estado.limit());
-				newEstado.put(records[1]);
+				newEstado.put(estado);
 				newEstado.flip();
-				var newIndex = new Index();
-				newIndex.setByteBuffer(newEstado);
-				groupEstado.put(newIndex, new Entero(1));
-			} else {
-				cuantosXEstado.inc(1);
+				var newIndex = new Index(newEstado, hashCode1);
+				cuantosXEstado = new Entero();
+				groupEstado.put(newIndex, cuantosXEstado);
 			}
-			var condicion = records[2];
-			index.setByteBuffer(condicion);
+			cuantosXEstado.inc();
+
+			index.setByteBuffer(condicion, hashCode2);
 			var cuantosXCondicion = groupCondicion.get(index);
 			if (cuantosXCondicion == null) {
 				var newCondicion = ByteBuffer.allocate(condicion.limit());
 				newCondicion.put(condicion);
 				newCondicion.flip();
-				var newIndex = new Index();
-				newIndex.setByteBuffer(newCondicion);
-				groupCondicion.put(newIndex, new Entero(1));
-			} else {
-				cuantosXCondicion.inc(1);
+				var newIndex = new Index(newCondicion, hashCode2);
+				cuantosXCondicion = new Entero();
+				groupCondicion.put(newIndex, cuantosXCondicion);
 			}
+			cuantosXCondicion.inc();
 		}
 
+		@Override
 		public ResumenContribuyente combinar(ResumenContribuyente other) {
 			count += other.count;
 			for (var e : other.groupEstado.entrySet()) {
@@ -105,7 +145,6 @@ public class EstadisticasContribuyentes5 {
 		}
 
 		public void show() {
-			System.out.println(count);
 			System.out.println("-".repeat(40));
 			groupEstado.entrySet().stream()//
 					.sorted(Map.Entry.comparingByValue())//
@@ -121,6 +160,7 @@ public class EstadisticasContribuyentes5 {
 						System.out.println(condicion + " " + e.getValue());
 					});
 			System.out.println("-".repeat(40));
+			System.out.println(count);
 		}
 	}
 }

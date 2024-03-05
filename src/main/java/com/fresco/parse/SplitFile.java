@@ -19,47 +19,39 @@ public class SplitFile {
 	private int maxRecords;
 	private int posRecord;
 	private byte separator;
+	@SuppressWarnings("rawtypes")
+	private IProcessor processor;
 
-	private SplitFile() {
-	}
-
-	private SplitFile(MappedByteBuffer byteBuffer, long size, int maxRecords, byte separator) {
+	public SplitFile(MappedByteBuffer byteBuffer, long size) {
 		this.byteBuffer = byteBuffer;
 		this.size = size;
 		this.count = 0;
+		this.maxRecords = 0;
+		this.posRecord = 0;
+	}
+
+	public void setProcessor(@SuppressWarnings("rawtypes") IProcessor processor) {
+		this.processor = processor;
+	}
+
+	public boolean processLine() {
+		return processor.processLine(byteBuffer, size);
+	}
+
+	public void setSeparator(char c) {
+		this.separator = (byte) c;
+	}
+
+	public void setMaxRecord(int maxRecords) {
 		this.maxRecords = maxRecords;
 		this.records = new ByteBuffer[maxRecords];
 		this.line = new ByteBuffer[maxRecords];
 		for (int i = 0; i < maxRecords; i++) {
 			records[i] = ByteBuffer.allocate(255);
 		}
-		this.posRecord = 0;
-		this.separator = separator;
 	}
 
-	public static List<SplitFile> split(String file, int maxRecords, char separator) throws IOException {
-		var listSplit = new ArrayList<SplitFile>();
-		var fileContribuyente = new RandomAccessFile(new File(file), "r");
-		var channel = fileContribuyente.getChannel();
-		var cores = Runtime.getRuntime().availableProcessors();
-		var length = channel.size();
-		var sizeChunk = length / cores;
-		var offset = 0l;
-		while (offset < length) {
-			var remaining = length - offset;
-			var chunk = remaining > sizeChunk ? sizeChunk : remaining;
-			var byteBuffer = channel.map(MapMode.READ_ONLY, offset, chunk);
-			do {
-				chunk--;
-			} while (byteBuffer.get((int) chunk) != '\n');
-			chunk++;
-			var worker = new SplitFile(byteBuffer, chunk, maxRecords, (byte) separator);
-			listSplit.add(worker);
-			offset += chunk;
-		}
-		return listSplit;
-	}
-
+	@Deprecated
 	public ByteBuffer[] getLine() {
 		for (int i = 0; i < maxRecords; i++) {
 			records[i].clear();
@@ -84,5 +76,28 @@ public class SplitFile {
 			}
 		}
 		return null;
+	}
+
+	public static List<SplitFile> split(String file) throws IOException {
+		var listSplit = new ArrayList<SplitFile>();
+		var fileContribuyente = new RandomAccessFile(new File(file), "r");
+		var channel = fileContribuyente.getChannel();
+		var cores = Runtime.getRuntime().availableProcessors();
+		var length = channel.size();
+		var sizeChunk = length / cores;
+		var offset = 0l;
+		while (offset < length) {
+			var remaining = length - offset;
+			var chunk = remaining > sizeChunk ? sizeChunk : remaining;
+			var byteBuffer = channel.map(MapMode.READ_ONLY, offset, chunk);
+			do {
+				chunk--;
+			} while (byteBuffer.get((int) chunk) != '\n');
+			chunk++;
+			var worker = new SplitFile(byteBuffer, chunk);
+			listSplit.add(worker);
+			offset += chunk;
+		}
+		return listSplit;
 	}
 }

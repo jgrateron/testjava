@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.fresco.parse.Entero;
+import com.fresco.parse.IProcessor;
 import com.fresco.parse.Index;
 import com.fresco.parse.SplitFile;
 
@@ -22,50 +23,59 @@ public class EstadisticasCpe {
 	}
 
 	public static void procesar() throws IOException {
-		var result = SplitFile.split(FILE, 2, '|').parallelStream()//
-				.map(sp -> {
-					var resumen = new ResumenCpe();
-					for (;;) {
-						var linea = sp.getLine();
-						if (linea == null) {
-							break;
-						}
-						resumen.acumular(linea);
-					}
-					return resumen;
-				})//
-				.collect(ResumenCpe::new, ResumenCpe::combinar, ResumenCpe::combinar);
+		var result = SplitFile.split(FILE).parallelStream()//
+				.collect(ResumenCpe::new, ResumenCpe::acumular, ResumenCpe::combinar);
 
 		System.out.println(result);
 		System.out.println(result.count);
 	}
 
-	static class ResumenCpe {
+	static class ResumenCpe implements IProcessor<ResumenCpe> {
+		private static byte SEPARATOR = '|';
 		private int count;
+		private int countRead;
 		private Map<Index, Entero> groupCpe;
 		private Index index;
+		private ByteBuffer codCpe;
+		private int hashCodCpe;
 
 		public ResumenCpe() {
 			count = 0;
+			countRead = 0;
 			groupCpe = new HashMap<Index, Entero>();
 			index = new Index();
+			codCpe = ByteBuffer.allocate(2);
+			hashCodCpe = 0;
 		}
 
-		public void acumular(ByteBuffer[] linea) {
+		@Override
+		public void acumular(SplitFile sf) {
+			sf.setProcessor(this);
+			for (;;) {
+				var continuar = sf.processLine();
+				if (!continuar) {
+					break;
+				}
+				acumular();
+			}
+		}
+
+		public void acumular() {
 			count++;
-			var codCpe = linea[1];
-			index.setByteBuffer(codCpe);
+			codCpe.flip();
+			index.setByteBuffer(codCpe, hashCodCpe);
 			var cantCpe = groupCpe.get(index);
 			if (cantCpe == null) {
 				var newCodCpe = ByteBuffer.allocate(codCpe.limit());
 				newCodCpe.put(codCpe);
 				newCodCpe.flip();
-				groupCpe.put(new Index(newCodCpe), new Entero(1));
-			} else {
-				cantCpe.inc(1);
+				cantCpe = new Entero();
+				groupCpe.put(new Index(newCodCpe, hashCodCpe), cantCpe);
 			}
+			cantCpe.inc(1);
 		}
 
+		@Override
 		public ResumenCpe combinar(ResumenCpe otro) {
 			count += otro.count;
 			for (var entry : otro.groupCpe.entrySet()) {
@@ -88,6 +98,29 @@ public class EstadisticasCpe {
 						return codCpe + ": " + e.getValue().toString();
 					})//
 					.collect(Collectors.joining("\n"));
+		}
+
+		@Override
+		public boolean processLine(ByteBuffer byteBuffer, long size) {
+			if (countRead < size) {
+				var b = byteBuffer.get(countRead++);
+				while (b != SEPARATOR) {
+					b = byteBuffer.get(countRead++);
+				}
+				codCpe.clear();
+				hashCodCpe = 0;
+				b = byteBuffer.get(countRead++);
+				do {
+					codCpe.put(b);
+					hashCodCpe = hashCodCpe * 31 + b;
+					b = byteBuffer.get(countRead++);
+				} while (b != SEPARATOR);
+				while (b != '\n') {
+					b = byteBuffer.get(countRead++);
+				}
+				return true;
+			}
+			return false;
 		}
 	}
 }

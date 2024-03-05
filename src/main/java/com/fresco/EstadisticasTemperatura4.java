@@ -23,7 +23,7 @@ public class EstadisticasTemperatura4 {
 	}
 
 	private static void procesar() throws IOException {
-		var result = SplitFile.split(FILE, 2, ';').parallelStream()//
+		var result = SplitFile.split(FILE).parallelStream()//
 				.collect(ResumenTemperatura::new, ResumenTemperatura::acumular, ResumenTemperatura::combinar);
 		System.out.println("{" + result + "}");
 	}
@@ -38,6 +38,8 @@ public class EstadisticasTemperatura4 {
 		}
 
 		public void acumular(SplitFile sp) {
+			sp.setSeparator(';');
+			sp.setMaxRecord(3);
 			for (;;) {
 				var linea = sp.getLine();
 				if (linea == null) {

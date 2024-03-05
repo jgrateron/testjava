@@ -3,8 +3,16 @@ package com.fresco.parse;
 public class Entero implements Comparable<Entero> {
 	private int value;
 
+	public Entero() {
+		this.value = 0;
+	}
+
 	public Entero(int value) {
 		this.value = value;
+	}
+
+	public void inc() {
+		this.value++;
 	}
 
 	public void inc(int value) {
