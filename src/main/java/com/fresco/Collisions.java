@@ -13,6 +13,7 @@ public class Collisions {
                     var ba = w.id.getBytes();
                     return calcHashCode(ba.length, ba, 0, ba.length);
                 })
+                .distinct()
                 .count();
         System.out.println();
         System.out.println("count Hash=     " + cantHash);
