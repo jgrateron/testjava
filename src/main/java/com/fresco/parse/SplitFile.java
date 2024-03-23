@@ -80,23 +80,24 @@ public class SplitFile {
 
 	public static List<SplitFile> split(String file) throws IOException {
 		var listSplit = new ArrayList<SplitFile>();
-		var fileContribuyente = new RandomAccessFile(new File(file), "r");
-		var channel = fileContribuyente.getChannel();
-		var cores = Runtime.getRuntime().availableProcessors();
-		var length = channel.size();
-		var sizeChunk = length / cores;
-		var offset = 0l;
-		while (offset < length) {
-			var remaining = length - offset;
-			var chunk = remaining > sizeChunk ? sizeChunk : remaining;
-			var byteBuffer = channel.map(MapMode.READ_ONLY, offset, chunk);
-			do {
-				chunk--;
-			} while (byteBuffer.get((int) chunk) != '\n');
-			chunk++;
-			var worker = new SplitFile(byteBuffer, chunk);
-			listSplit.add(worker);
-			offset += chunk;
+		try (var fileContribuyente = new RandomAccessFile(new File(file), "r")) {
+			var channel = fileContribuyente.getChannel();
+			var cores = Runtime.getRuntime().availableProcessors();
+			var length = channel.size();
+			var sizeChunk = length / cores;
+			var offset = 0l;
+			while (offset < length) {
+				var remaining = length - offset;
+				var chunk = remaining > sizeChunk ? sizeChunk : remaining;
+				var byteBuffer = channel.map(MapMode.READ_ONLY, offset, chunk);
+				do {
+					chunk--;
+				} while (byteBuffer.get((int) chunk) != '\n');
+				chunk++;
+				var worker = new SplitFile(byteBuffer, chunk);
+				listSplit.add(worker);
+				offset += chunk;
+			}
 		}
 		return listSplit;
 	}

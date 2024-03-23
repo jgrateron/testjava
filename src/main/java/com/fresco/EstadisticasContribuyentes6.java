@@ -69,8 +69,6 @@ public class EstadisticasContribuyentes6 {
 				while (b != separator) {
 					b = bb.get(countBytes++);
 				}
-				while (b != separator)
-					;
 				estado.clear();
 				hashCode1 = 0;
 				b = bb.get(countBytes++);
@@ -161,6 +159,7 @@ public class EstadisticasContribuyentes6 {
 					});
 			System.out.println("-".repeat(40));
 			System.out.println(count);
+			System.out.println("-".repeat(40));
 		}
 	}
 }
