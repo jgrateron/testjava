@@ -3,6 +3,8 @@ package com.fresco;
 import java.util.stream.Stream;
 
 public class RomanToInt {
+	public record Roman(String ch, Integer cur, Integer old) {
+	};
 
 	public static void main(String[] args) {
 		assertEquals(romanToInt("XXX"), 30);
@@ -14,28 +16,27 @@ public class RomanToInt {
 	}
 
 	public static int romanToInt(String str) {
-		record Roman(String ch, Integer cur, Integer old) {};
 		return Stream.of(str.split(""))
-		      .map(ch -> new Roman(ch, RoToIn(ch), RoToIn(ch)))
-		      .reduce((ac, ro) -> {
-		    	  if (ac.old >= ro.cur)
-		    		  return new Roman(ro.ch, ac.cur + ro.cur, ro.old);
-		    	  else
-		    		  return new Roman(ro.ch, ac.cur - ac.old  + ro.cur - ac.old, ro.old);
-		      })
-		      .orElseThrow().cur;
+				.map(ch -> new Roman(ch, RoToIn(ch), RoToIn(ch)))
+				.reduce((ac, ro) -> {
+					if (ac.old >= ro.cur)
+						return new Roman(ro.ch, ac.cur + ro.cur, ro.old);
+					else
+						return new Roman(ro.ch, ac.cur - ac.old + ro.cur - ac.old, ro.old);
+				})
+				.orElseThrow().cur;
 	}
 
 	public static int RoToIn(String c) {
 		return switch (c) {
-		case "I" -> 1;
-		case "V" -> 5;
-		case "X" -> 10;
-		case "L" -> 50;
-		case "C" -> 100;
-		case "D" -> 500;
-		case "M" -> 1000;
-		default -> throw new IllegalArgumentException("Unexpected value: " + c);
+			case "I" -> 1;
+			case "V" -> 5;
+			case "X" -> 10;
+			case "L" -> 50;
+			case "C" -> 100;
+			case "D" -> 500;
+			case "M" -> 1000;
+			default -> throw new IllegalArgumentException("Unexpected value: " + c);
 		};
 	}
 

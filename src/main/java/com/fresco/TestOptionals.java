@@ -2,7 +2,6 @@ package com.fresco;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class TestOptionals {
 	public record Identificacion(String nombre, Integer edad) {

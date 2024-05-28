@@ -1,13 +1,11 @@
 package com.fresco;
 
-import java.math.BigInteger;
 import java.util.function.Predicate;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 public class PrimeFactors {
 	public static void main(String[] args) {
-		BigInteger number = BigInteger.valueOf(9223372036854775807L);
 		Predicate <Long> isPrime = num -> {
 			return num > 1 && LongStream.rangeClosed(2, 1000).allMatch(n -> num % n != 0) &&
 					          LongStream.rangeClosed(1001, Math.round(Math.sqrt(num)))

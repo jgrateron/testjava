@@ -3,5 +3,8 @@
 .project
 .settings
 .target
+.vscode
+profile.html
 /.apt_generated/
 /.apt_generated_tests/
+*.txt
