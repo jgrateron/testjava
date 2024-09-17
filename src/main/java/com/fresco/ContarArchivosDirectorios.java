@@ -10,7 +10,7 @@ public class ContarArchivosDirectorios {
 	};
 
 	public static void main(String[] args) throws IOException {
-		String path = "/usr/lib/";
+		String path = "/home/jairo/";
 
 		var result = Files.list(Paths.get(path))
 		.map( p -> new Acum(Files.isRegularFile(p) ? 1 : 0, Files.isDirectory(p) ? 1 : 0, 1))

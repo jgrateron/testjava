@@ -10,13 +10,11 @@ public class Balanceado {
 		System.out.println(esBalanceado("{ [ a * ( c + d ) ] - 5 } }"));
 	}
 
-	public static boolean esBalanceado(String cadena)
-	{
+	public static boolean esBalanceado(String cadena) {
 		var caracteres = cadena.toCharArray();
 		var pila = new Stack<Character>();
-		for (var c : caracteres)
-		{
-			switch(c) {
+		for (var c : caracteres) {
+			switch (c) {
 			case '[', '{', '(':
 				pila.push(cierreDe(c));
 				break;
@@ -29,7 +27,7 @@ public class Balanceado {
 		}
 		return pila.isEmpty();
 	}
-	
+
 	public static char cierreDe(char c) {
 		return switch (c) {
 		case '[' -> ']';
@@ -39,4 +37,3 @@ public class Balanceado {
 		};
 	}
 }
-

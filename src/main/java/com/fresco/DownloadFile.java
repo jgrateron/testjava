@@ -1,35 +1,24 @@
 package com.fresco;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 
 public class DownloadFile {
 
+	public static String URL = "https://worldradiohistory.com/Archive-Electronics/90s/92/Electronics-1992-01.pdf";
+	public static byte[] buffer = new byte[8192];
+
 	public static void main(String[] args) throws IOException {
-		var url = new URL("https://worldradiohistory.com/Archive-Electronics/90s/92/Electronics-1992-01.pdf");
-		var resource = url.getFile();
-		var array = resource.split("/");
-		if (array.length > 0) {
-			System.out.println(array[array.length - 1]);
-		}
-		var connection = url.openConnection();
-		try (var inputStream = connection.getInputStream()) {
-			var file = new File("/tmp/Electronics-1992-01.pdf");
-			try (var outputStream = new FileOutputStream(file)) {
-				byte[] buffer = new byte[8192];
-				int bytesRead;
-				int downloadedBytes = 0;
-				long fileSize = connection.getContentLengthLong();
-				while ((bytesRead = inputStream.read(buffer)) != -1) {
-					outputStream.write(buffer, 0, bytesRead);
-					downloadedBytes += bytesRead;
-					System.out.println("Downloaded " + (downloadedBytes * 100) / fileSize + "%");
-				}
+		var url = URI.create(URL).toURL();
+		var array = url.getFile().split("/");
+		var fileDest = "/tmp/" + (array.length > 0 ? array[array.length - 1] : "temp.out");
+		try (var is = url.openConnection().getInputStream()) {
+			try (var outputStream = new FileOutputStream(fileDest)) {
+				var downloadedBytes = is.transferTo(outputStream);
+				System.out.println("File downloaded successfully. " + downloadedBytes);
 			}
 		}
-		System.out.println("File downloaded successfully.");
-	}
 
+	}
 }

@@ -1,39 +1,30 @@
 package com.fresco;
 
 import java.io.ByteArrayOutputStream;
-import java.util.stream.IntStream;
+import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 
 public class Bin2Text {
 
-	public static void main(String[] args) {
-		var binary = "0110011001100101011011000110100101111010001000000110001101110101011011010111000001101100011001010110000111000011101100010110111101110011";
-		var cad = binaryToText(binary);
-		System.out.println(cad);
-	}
+	private static String BINARY = """
+			010010000110111101101100011000010010000001001101011101010110111001100
+			100011011110000101001001000011001010110110001101100011011110010000001
+			010111011011110111001001101100011001000000101011100011100000111000111
+			111100011100000111010110111100011100000111011110011100011100000111011
+			101111100011100000111010111111100011100000111011110011100011100000111
+			010101111100011100000111000100100001010111011011001011110101100111010
+			111010000110011100001000001110110010011011100101001110101110010011100
+			111000000101011100100101111011010000011100101101001011011110111100100
+			101110001001011011100111100101011000110000001010
+			""";
 
-	public static String convert(String input) {
-		StringBuilder sb = new StringBuilder();
-		for (var s : input.split(" ")) {
-			sb.append((char) Integer.parseInt(s, 2));
-		}
-		return sb.toString();
-	}
+	public static void main(String[] args) throws UnsupportedEncodingException {
+		var binary = BINARY.lines().reduce("", String::concat);
 
-	public static void combiner(ByteArrayOutputStream a, ByteArrayOutputStream b) {
-	}
+		var res = Arrays.stream(binary.split("(?<=\\G.{8})"))//
+				.map(eightBits -> Integer.parseInt(eightBits, 2))//
+				.collect(() -> new ByteArrayOutputStream(), (a, b) -> a.write(b), (a, b) -> {});
 
-	public static String binaryToText(String binary) {
-		var partition = 8;
-		var groups = binary.length() / partition;
-		var res = IntStream.range(0, groups)
-				.mapToObj(i -> {
-					var ini = i * partition;
-					var end = ini + partition;
-					return binary.substring(ini, end);
-				})
-				.map(s -> Integer.parseInt(s, 2))
-				.collect(ByteArrayOutputStream::new, ByteArrayOutputStream::write, Bin2Text::combiner);
-		return new String(res.toByteArray());
+		System.out.println(new String(res.toByteArray(), "UTF-8"));
 	}
-
 }
