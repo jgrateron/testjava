@@ -3,7 +3,7 @@ package com.fresco;
 import java.util.stream.Stream;
 
 public class RomanToInt {
-	public record Roman(String ch, Integer cur, Integer old) {
+	public record Roman(String ch, int cur, int old) {
 	};
 
 	public static void main(String[] args) {

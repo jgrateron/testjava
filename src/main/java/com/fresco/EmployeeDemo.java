@@ -1,15 +1,22 @@
 package com.fresco;
 
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.comparingDouble;
+import static java.util.Comparator.comparingInt;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.minBy;
+import static java.util.stream.Collectors.summingDouble;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fresco.domain.Employee;
 
 public class EmployeeDemo {
@@ -109,11 +116,15 @@ public class EmployeeDemo {
 					getContactInfo("benjamin.taylor@example.com", "9012345678"), dateFormat.parse("11/07/2019"), true,
 					"FullStack");
 			employees.add(emp16);
-
+			record Empleados (List<Employee> employees) {}
+			var empleados = new Empleados(employees);
+			var objectMapper = new ObjectMapper();
+			var json = objectMapper.writeValueAsString(employees);
+			System.out.println(json);
 			// Display employee details
-			resolve(employees);
-			resolveComplex(employees);
-		} catch (ParseException e) {
+			//resolve(employees);
+			//resolveComplex(employees);
+		} catch (ParseException | JsonProcessingException e) {
 			e.printStackTrace();
 		}
 	}
@@ -147,7 +158,7 @@ public class EmployeeDemo {
 		System.out.println("-".repeat(500));
 		// Problem: Find the employee with the highest salary
 		var maxSalary = employees.stream()//
-				.max(Comparator.comparingDouble(e -> e.getSalary()));
+				.max(comparingDouble(e -> e.getSalary()));
 		if (maxSalary.isPresent()) {
 			System.out.println(maxSalary.get());
 		} else {
@@ -156,7 +167,7 @@ public class EmployeeDemo {
 		System.out.println("-".repeat(500));
 		// Problem: Group employees by their age
 		var employeesByAge = employees.stream()//
-				.collect(Collectors.groupingBy(Employee::getAge));
+				.collect(groupingBy(Employee::getAge));
 		employeesByAge.forEach((edad, empleados) -> {
 			System.out.println(edad + " " + empleados);
 		});
@@ -175,13 +186,13 @@ public class EmployeeDemo {
 	private static void resolveComplex(List<Employee> employees) {
 		// Problem: Find the employee with the most number of skills
 		var maxSkill = employees.stream()//
-				.max(Comparator.comparingInt(e -> e.getSkills().size()));
+				.max(comparingInt(e -> e.getSkills().size()));
 		System.out.println(maxSkill);
 		System.out.println("-".repeat(500));
 		// Problem: Calculate the total salary of active employees in each department
 		var totalSalary = employees.stream()//
 				.filter(Employee::isActive)//
-				.collect(Collectors.groupingBy(Employee::getDepartment, Collectors.summingDouble(Employee::getSalary)));
+				.collect(groupingBy(Employee::getDepartment, summingDouble(Employee::getSalary)));
 		totalSalary.forEach((departamento, stadistica) -> {
 			System.out.println(departamento + " " + stadistica);
 		});
@@ -189,8 +200,8 @@ public class EmployeeDemo {
 		// Problem: Find the employee who joined first in each department
 		var joinedFirst = employees.stream()//
 				.filter(Employee::isActive)//
-				.collect(Collectors.groupingBy(Employee::getDepartment,
-						Collectors.minBy(Comparator.comparing(Employee::getHireDate))));
+				.collect(groupingBy(Employee::getDepartment,
+						minBy(comparing(Employee::getHireDate))));
 
 		joinedFirst.forEach((departamento, employee) -> {
 			System.out.println(departamento + " " + employee);
@@ -210,7 +221,7 @@ public class EmployeeDemo {
 		// Problem: Sort employees based on their skills (lexicographically) and then by
 		// salary (descending)
 		var sortEmployees = employees.stream()//
-				.sorted(Comparator.comparing(Employee::getSkills, Comparator.comparing(List::toString))
+				.sorted(comparing(Employee::getSkills, comparing(List::toString))
 						.thenComparingDouble(Employee::getSalary).reversed());
 
 		sortEmployees.forEach(System.out::println);

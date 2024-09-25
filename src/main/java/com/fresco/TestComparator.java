@@ -1,6 +1,7 @@
 package com.fresco;
 
-import java.util.Comparator;
+import static java.util.Comparator.comparing;
+
 import java.util.List;
 
 public class TestComparator {
@@ -13,14 +14,11 @@ public class TestComparator {
 				new DiaSemana("Miércoles", 3), new DiaSemana("Jueves", 4), new DiaSemana("Viernes", 5),
 				new DiaSemana("Sábado", 6));
 
-		Comparator<DiaSemana> comparador = (d1, d2) -> {
-			return Integer.compare(d1.pos, d2.pos);
-		};
-
-		listaDias.stream().sorted(comparador).forEach(System.out::println);
+		listaDias.stream().sorted(comparing(DiaSemana::pos).reversed().thenComparing(comparing(DiaSemana::nombre)))
+				.forEach(System.out::println);
 		System.out.println("-".repeat(30));
 
-		listaDias.stream().sorted(comparador.reversed()).forEach(System.out::println);
+		listaDias.stream().sorted(comparing(DiaSemana::pos)).forEach(System.out::println);
 		System.out.println("-".repeat(30));
 	}
 }

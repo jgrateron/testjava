@@ -31,7 +31,7 @@ public class DigestSum {
 
 	private static void showDigestHex(String algo, byte[] digest) {
 		var hex = HexFormat.of().formatHex(digest);
-		System.out.println("%6s: %s".formatted(algo, hex));
+		System.out.println("%-6s: %s".formatted(algo, hex));
 	}
 }
 

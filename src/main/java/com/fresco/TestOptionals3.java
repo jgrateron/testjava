@@ -6,36 +6,61 @@ import java.util.Optional;
 public class TestOptionals3 {
 
 	public record Pais(String nombre, String codigo) {
-		public Optional<String> getCodigo(){
-			return Optional.ofNullable(codigo);
-		}
-	};
+	}
 
 	public record Direccion(Pais pais, String ciudad) {
-		public Optional<Pais> getPais(){
-			return Optional.ofNullable(pais);
-		}
-	};
+	}
 
 	public record Persona(String nombre, Direccion direccion) {
-		public Optional<Direccion> getDireccion(){
-			return Optional.ofNullable(direccion);
-		}
-	};
-	
+	}
+
 	public static void main(String[] args) {
 		var personas = List.of(new Persona("Persona1", null), new Persona("Persona3", new Direccion(null, null)),
 				new Persona("Persona3", new Direccion(new Pais(null, null), null)),
-				new Persona("Persona4", new Direccion(new Pais("Pais", "PA"), null)));
+				new Persona("Persona4", new Direccion(new Pais("PERU", "PE"), null)));
 
-		for (var pe : personas) {
-			var codigo = Optional.ofNullable(pe)
-								.flatMap(Persona::getDireccion)
-					            .flatMap(Direccion::getPais)
-					            .map(Pais::codigo)
-					            .orElse("No existe codigo");
-			System.out.println(codigo);
+		for (var persona : personas) {
+			try {
+				var codigo = persona.direccion.pais.codigo;
+				System.out.println(codigo + " - " + codigo.substring(0, 2));
+			} catch (NullPointerException e) {
+				System.err.println(e.getMessage());
+			}
 		}
+
+		for (var persona : personas) {
+			var codigo = Optional.ofNullable(persona)//
+					.map(Persona::direccion)//
+					.map(Direccion::pais)//
+					.map(Pais::nombre)//
+					.map(c -> persona.nombre + " " + c)
+					.orElse( persona.nombre + " "  + "No tiene pais");					
+			System.out.println(codigo + " - " + codigo.substring(0, 2));
+		}
+
+		try {
+			personas.stream()//
+					.map(Persona::direccion)//
+					.map(Direccion::pais)//
+					.map(Pais::nombre)//
+					.forEach(codigo -> {
+						System.out.println(codigo + " - " + codigo.substring(0, 2));
+					});
+		} catch (NullPointerException e) {
+			System.err.println(e.getMessage());
+		}
+
+		personas.stream()//
+				.map(persona -> {
+					return Optional.ofNullable(persona)//
+							.map(Persona::direccion)//
+							.map(Direccion::pais)//
+							.map(Pais::nombre)//
+							.map(c -> persona.nombre + " " + c)
+							.orElse( persona.nombre + " "  + "No pais");
+				})//
+				.forEach(codigo -> {
+					System.out.println(codigo + " - " + codigo.substring(0, 2));
+				});
 	}
 }
-

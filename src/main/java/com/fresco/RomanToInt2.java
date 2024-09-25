@@ -5,12 +5,7 @@ import java.util.stream.Stream;
 public class RomanToInt2 {
 
 	public static void main(String[] args) {
-		assertEquals(romanToInt("XXX"), 30);
-		assertEquals(romanToInt("VII"), 7);
-		assertEquals(romanToInt("CLXVIII"), 168);
-		assertEquals(romanToInt("IV"), 4);
-		assertEquals(romanToInt("MMXXII"), 2022);
-		assertEquals(romanToInt("MCMXCIX"), 1999);
+
 		var correcto = DATATEST.lines()
 				.allMatch(l -> {
 					var arr = l.split(" ");
@@ -25,14 +20,6 @@ public class RomanToInt2 {
 		return Stream.of(str.split(""))//
 				.collect(Roman::new, Roman::accumulator, Roman::combine)//
 				.getCur();
-	}
-
-	public static void assertEquals(int exp, int res) {
-		if (exp == res) {
-			System.out.println("OK %d".formatted(exp));
-		} else {
-			System.err.println("ER %d %d".formatted(exp, res));
-		}
 	}
 
 	public static String DATATEST = """
@@ -181,14 +168,6 @@ public class RomanToInt2 {
 
 		public int getCur() {
 			return cur;
-		}
-		
-		public String valueOf(int n) {
-			return "";
-		}
-		
-		public int valueOf(String r) {
-			return 0;
-		}
+		}		
 	}
 }

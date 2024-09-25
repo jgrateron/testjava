@@ -5,11 +5,10 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
 public class PrimeNumbers {
+	public record Number(int value, boolean isPrime) {
+	}
 
 	public static void main(String[] args) {
-
-		record Number(int value, boolean isPrime) {
-		}
 
 		IntFunction<Number> intToNumber = num -> {
 			boolean isPrime = num > 1
@@ -17,24 +16,17 @@ public class PrimeNumbers {
 			return new Number(num, isPrime);
 		};
 
-		var listNumbers = IntStream.rangeClosed(1, 100)//
-				.mapToObj(intToNumber)//
-				.toList();
-
-		var max = 4;
-
-		System.out.println(" " + "-".repeat((max + 1) * 10));
+		var listNumbers = IntStream.rangeClosed(1, 100).mapToObj(intToNumber).toList();
+		System.out.println(" " + "-".repeat(50));
 		listNumbers.forEach(n -> {
 			if (n.value % 10 == 1)
 				System.out.print("|");
-
-			var str = Integer.toString(n.value);
-			str = " ".repeat(max - str.length()) + str + (n.isPrime ? "*" : " ");
-			System.out.print(str);
-
+			var cad = "%5s".formatted(Integer.toString(n.value) + (n.isPrime ? "*" : " "));
+			System.out.print(cad);
 			if (n.value % 10 == 0)
 				System.out.println("|");
 		});
-		System.out.println(" " + "-".repeat((max + 1) * 10));
+		System.out.println(" " + "-".repeat(50));
 	}
 }
+
