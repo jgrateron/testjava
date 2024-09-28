@@ -10,21 +10,19 @@ import java.util.stream.Collectors;
 public class CpuInfo {
 
 	public static void main(String[] args) throws IOException {
-		var cpuInfo = Files.lines(Path.of("/proc/cpuinfo"))//
+
+		var mapCpuInfo = Files.lines(Path.of("/proc/cpuinfo"))//
 				.map(l -> {
 					var ar = l.split(":");
 					return ar.length == 2 ? Map.entry(ar[0].trim().toLowerCase(), ar[1].trim()) : null;
 				}).filter(Objects::nonNull)//
-				.toList();
-
-		var mapCpuInfo = cpuInfo.stream()//
-				.collect(Collectors.groupingBy(Map.Entry::getKey));
+				.collect(Collectors.groupingBy(Map.Entry::getKey,
+						Collectors.mapping(Map.Entry::getValue, Collectors.toSet())));
 
 		mapCpuInfo.entrySet().stream()//
 				.sorted(Map.Entry.comparingByKey())//
 				.forEach(e -> {
-					var set = e.getValue().stream().map(Map.Entry::getValue).collect(Collectors.toSet());
-					var join = String.join(", ", set);
+					var join = String.join(", ", e.getValue());
 					System.out.println("%-20s: %s".formatted(e.getKey(), join));
 				});
 	}
