@@ -6,7 +6,7 @@ import java.net.URI;
 
 public class DownloadFile {
 
-	public static String URL = "https://worldradiohistory.com/Archive-Electronics/90s/92/Electronics-1992-01.pdf";
+	public static String URL = "https://www.worldradiohistory.com/Archive-Electronics/90s/92/Electronics-1992-01.pdf";
 	public static byte[] buffer = new byte[8192];
 
 	public static void main(String[] args) throws IOException {
