@@ -13,7 +13,7 @@ import com.fresco.parse.Index;
 import com.fresco.parse.SplitFile;
 
 public class Desafio1BR7 {
-	public static String FILE = "./measurements.txt";
+	public static String FILE = "/opt/desafio/measurements.txt";
 
 	public static void main(String[] args) throws IOException {
 		Locale.setDefault(Locale.US);
