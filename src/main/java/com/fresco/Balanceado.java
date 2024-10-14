@@ -8,9 +8,12 @@ public class Balanceado {
 		System.out.println(esBalanceado("{ [ a * ( c + d ) ] - 5 }"));
 		System.out.println(esBalanceado("{ a * ( c + d ) ] - 5 }"));
 		System.out.println(esBalanceado("{ [ a * ( c + d ) ] - 5 } }"));
+		System.out.println(esBalanceado("[[]]"));
+		System.out.println(esBalanceado("[[]]["));
 	}
 
 	public static boolean esBalanceado(String cadena) {
+		System.out.print("%-30s: ".formatted(cadena));
 		var caracteres = cadena.toCharArray();
 		var pila = new Stack<Character>();
 		for (var c : caracteres) {

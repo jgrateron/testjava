@@ -12,11 +12,13 @@ public class DigestSum {
 
 	public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
 		var file = new File("/bin/bash");
+		showDigestHex("MD2", calDigest(MessageDigest.getInstance("MD2"), file));
 		showDigestHex("MD5", calDigest(MessageDigest.getInstance("MD5"), file));
 		showDigestHex("SHA1", calDigest(MessageDigest.getInstance("SHA1"), file));
 		showDigestHex("SHA256", calDigest(MessageDigest.getInstance("SHA256"), file));
 		showDigestHex("SHA384", calDigest(MessageDigest.getInstance("SHA384"), file));
 		showDigestHex("SHA512", calDigest(MessageDigest.getInstance("SHA512"), file));
+		showDigestHex("SHA3-256", calDigest(MessageDigest.getInstance("SHA3-256"), file));
 	}
 
 	public static byte[] calDigest(MessageDigest msgDigest, File file) throws FileNotFoundException, IOException {
@@ -31,7 +33,8 @@ public class DigestSum {
 
 	private static void showDigestHex(String algo, byte[] digest) {
 		var hex = HexFormat.of().formatHex(digest);
-		System.out.println("%-7s: %s".formatted(algo, hex));
+		System.out.println("%-9s: %s".formatted(algo, hex));
 	}
 }
+
 

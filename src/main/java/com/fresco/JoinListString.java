@@ -24,8 +24,5 @@ public class JoinListString {
 
 		System.out.println(fruits.stream().collect(Collectors.joining(", ")));
 		
-		System.out.println(fruits.stream().collect(StringBuilder::new,
-				(sb, s) -> sb.append(sb.isEmpty() ? s : ", " + s), StringBuilder::append));
-
 	}
 }
