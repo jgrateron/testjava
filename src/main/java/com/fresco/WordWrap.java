@@ -3,7 +3,7 @@ package com.fresco;
 import java.io.IOException;
 import java.io.StringReader;
 
-public class TextReaders {
+public class WordWrap {
 	public static char enterEmoji = 8629;
 
 	public static String text = """

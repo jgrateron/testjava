@@ -15,15 +15,18 @@ import static java.util.stream.Collectors.joining;
 public class EstadisticasAgrupadas {
 
 	record Gasto(String concepto, String fecha, double monto) {
+		public static Gasto of(String concepto, String fecha, double monto) {
+			return new Gasto(concepto, fecha, monto);
+		}
 	};
 
 	private static List<Gasto> getGastos() {
-		return List.of(new Gasto("Comida", "2022-06-01", 100.00), new Gasto("Transporte", "2022-06-01", 10.00),
-				new Gasto("Otros", "2022-06-01", 30), new Gasto("Comida", "2022-06-02", 120.00),
-				new Gasto("Transporte", "2022-06-02", 20.00), new Gasto("Otros", "2022-06-02", 10),
-				new Gasto("Comida", "2022-06-03", 80.00), new Gasto("Transporte", "2022-06-03", 5.00),
-				new Gasto("Comida", "2022-06-04", 70.00), new Gasto("Transporte", "2022-06-04", 10.00),
-				new Gasto("Otros", "2022-06-04", 25), new Gasto("Cine", "2022-06-04", 200));
+		return List.of(Gasto.of("Comida", "2022-06-01", 100.00), Gasto.of("Transporte", "2022-06-01", 10.00),
+				Gasto.of("Otros", "2022-06-01", 30), Gasto.of("Comida", "2022-06-02", 120.00),
+				Gasto.of("Transporte", "2022-06-02", 20.00), Gasto.of("Otros", "2022-06-02", 10),
+				Gasto.of("Comida", "2022-06-03", 80.00), Gasto.of("Transporte", "2022-06-03", 5.00),
+				Gasto.of("Comida", "2022-06-04", 70.00), Gasto.of("Transporte", "2022-06-04", 10.00),
+				Gasto.of("Otros", "2022-06-04", 25), Gasto.of("Cine", "2022-06-04", 200));
 	}
 
 	public static void main(String[] args) {
