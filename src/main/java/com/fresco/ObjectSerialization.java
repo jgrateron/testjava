@@ -1,13 +1,12 @@
 package com.fresco;
 
-import static java.util.stream.Collectors.joining;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HexFormat;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,6 +17,7 @@ public class ObjectSerialization {
 			{
 				"name": "John Doe",
 				"age" : 30,
+				"birth_date" : "1980-01-01",
 				"address" : {
 					"street" : "123 Main St",
 					"city" : "Springfield",
@@ -29,10 +29,11 @@ public class ObjectSerialization {
 	public record Address(String street, String city, String zip) implements Serializable {
 	}
 
-	public record Person(String name, int age, Address address) implements Serializable {
+	public record Person(String name, int age, String birth_date, Address address) implements Serializable {
 	}
 
 	public static void main(String[] args) throws IOException {
+		System.out.println();
 		printHex(json.getBytes());
 		System.out.println();
 		var objectMapper = new ObjectMapper();
@@ -53,19 +54,12 @@ public class ObjectSerialization {
 						var hex = HexFormat.of().formatHex(buffer, i, i + 1);
 						return hex + (i % 2 == 0 ? "" : " ");
 					})//
-					.collect(joining());
+					.collect(Collectors.joining());
 			var cad2 = IntStream.range(0, c)//
-					.mapToObj(i -> {
-						var b = buffer[i];
-						var l = b > 32 && b < 127 ? String.valueOf((char) b) : ".";
-						return l + (i % 2 == 0 ? "" : " ");
-					})//
-					.collect(joining());
-			var cad3 = IntStream.range(0, c)//
 					.map(i -> buffer[i])//
 					.mapToObj(b -> b > 32 && b < 127 ? String.valueOf((char) b) : ".")//
-					.collect(joining());
-			System.out.println("%-40s %s %s".formatted(cad1, cad2, cad3));
+					.collect(Collectors.joining());
+			System.out.println("%-40s %s".formatted(cad1, cad2));
 		}
 	}
 }
