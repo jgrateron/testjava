@@ -13,6 +13,7 @@ public class RomanToInt {
 		assertEquals(romanToInt("IV"), 4);
 		assertEquals(romanToInt("MMXXII"), 2022);
 		assertEquals(romanToInt("MCMXCIX"), 1999);
+		assertEquals(romanToInt("MMXXIV"), 2024);
 	}
 
 	public static int romanToInt(String str) {
