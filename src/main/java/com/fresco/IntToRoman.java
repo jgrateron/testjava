@@ -9,9 +9,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class IntToRoman {
-	private static List<Map.Entry<Integer, String>> romanNumerals = List.of(entry(1000, "M"), entry(900, "CM"),
-			entry(500, "D"), entry(400, "CD"), entry(100, "C"), entry(90, "XC"), entry(50, "L"), entry(40, "XL"),
-			entry(10, "X"), entry(9, "IX"), entry(5, "V"), entry(4, "IV"), entry(1, "I"));
+	private static List<Map.Entry<Integer, String>> romanNumerals = List.of(//
+			entry(1000, "M"), entry(900, "CM"), entry(500, "D"), //
+			entry(400, "CD"), entry(100, "C"), entry(90, "XC"), //
+			entry(50, "L"), entry(40, "XL"), entry(10, "X"), //
+			entry(9, "IX"), entry(5, "V"), entry(4, "IV"), entry(1, "I"));
 
 	public static String toRoman(int number) {
 		var num = new AtomicInteger(number);
