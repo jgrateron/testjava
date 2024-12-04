@@ -5,14 +5,14 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 import java.util.Stack;
 
 public class Minesweeper extends JFrame {
 
 	private static final long serialVersionUID = 1L;
-	private final int rows = 10;
-	private final int cols = 10;
+	private static final String mine = "*";
+	private final int rows = 12;
+	private final int cols = 12;
 	private final int minas = (rows * cols) / 13;
 	private JButton[][] botones;
 	private int[][] tablero; // 0: empty, -1: mine, >0: number of adjacent mines
@@ -52,15 +52,12 @@ public class Minesweeper extends JFrame {
 	private void crearComponentes() {
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
-				JButton boton = new JButton("");
+				var boton = new JButton("");
 				boton.setFont(new Font("SansSerif", Font.BOLD, 14));
-				boton.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						int fila = getFila(e.getSource());
-						int columna = getColumna(e.getSource());
-						revelarCasilla(fila, columna);
-					}
+				boton.addActionListener((e) -> {
+					int fila = getFila(e.getSource());
+					int columna = getColumna(e.getSource());
+					revelarCasilla(fila, columna);
 				});
 				boton.addMouseListener(new MouseAdapter() {
 					@Override
@@ -85,8 +82,8 @@ public class Minesweeper extends JFrame {
 	}
 
 	private int[][] generarTablero() {
-		int[][] tablero = new int[rows][cols];
-		Random random = new Random();
+		var tablero = new int[rows][cols];
+		var random = new Random();
 		int minasColocadas = 0;
 		while (minasColocadas < minas) {
 			int fila = random.nextInt(rows);
@@ -110,6 +107,7 @@ public class Minesweeper extends JFrame {
 	}
 
 	public void mostrarTableroText(int[][] tablero) {
+		System.out.println();
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
 				System.out.print("%2d".formatted(tablero[i][j]));
@@ -132,7 +130,7 @@ public class Minesweeper extends JFrame {
 
 	private void revelarCasilla(int fila, int columna) {
 		if (tablero[fila][columna] == -1) {
-			botones[fila][columna].setText("X");
+			botones[fila][columna].setText(mine);
 			revelarTodoElTablero("Lost!");
 			return;
 		}
@@ -167,7 +165,7 @@ public class Minesweeper extends JFrame {
 			for (int j = 0; j < cols; j++) {
 				botones[i][j].setEnabled(false);
 				if (tablero[i][j] == -1) {
-					botones[i][j].setText("X");
+					botones[i][j].setText(mine);
 				} else if (tablero[i][j] == 0) {
 					botones[i][j].setText("");
 				} else {
@@ -179,14 +177,16 @@ public class Minesweeper extends JFrame {
 	}
 
 	private void revelarVacias(int fila, int columna) {
-		Stack<Coordenadas> pila = new Stack<>();
-		Set<Coordenadas> visitados = new HashSet<>();
-		pila.push(new Coordenadas(fila, columna));
-		visitados.add(new Coordenadas(fila, columna));
+		record Coordenada(int row, int col) {
+		}
+		var pila = new Stack<Coordenada>();
+		var visitados = new HashSet<Coordenada>();
+		pila.push(new Coordenada(fila, columna));
+		visitados.add(new Coordenada(fila, columna));
 		while (!pila.isEmpty()) {
-			Coordenadas coordenadas = pila.pop();
-			int f = coordenadas.fila;
-			int c = coordenadas.columna;
+			var coordenadaActual = pila.pop();
+			int f = coordenadaActual.row;
+			int c = coordenadaActual.col;
 
 			if (f < 0 || f >= rows || c < 0 || c >= cols || !botones[f][c].getText().equals("")
 					|| tablero[f][c] != 0) {
@@ -196,7 +196,7 @@ public class Minesweeper extends JFrame {
 			botones[f][c].setEnabled(false);
 			for (int i = Math.max(0, f - 1); i <= Math.min(rows - 1, f + 1); i++) {
 				for (int j = Math.max(0, c - 1); j <= Math.min(cols - 1, c + 1); j++) {
-					Coordenadas coordenada = new Coordenadas(i, j);
+					var coordenada = new Coordenada(i, j);
 					if (!visitados.contains(coordenada)) {
 						pila.push(coordenada);
 						visitados.add(coordenada);
@@ -242,31 +242,6 @@ public class Minesweeper extends JFrame {
 			setTitle("Minesweeper %dx%d".formatted(rows, cols));
 		} else {
 			this.dispose();
-		}
-	}
-
-	class Coordenadas {
-		int fila;
-		int columna;
-
-		public Coordenadas(int fila, int columna) {
-			this.fila = fila;
-			this.columna = columna;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null || getClass() != obj.getClass())
-				return false;
-			Coordenadas other = (Coordenadas) obj;
-			return fila == other.fila && columna == other.columna;
-		}
-
-		@Override
-		public int hashCode() {
-			return Integer.hashCode(fila * 1000 + columna);
 		}
 	}
 }
