@@ -9,7 +9,7 @@ public class TetrisBoard extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 1L;
 	public static final int BOARD_WIDTH = 12;
 	public static final int BOARD_HEIGHT = 20;
-	private static final int SQUARE_SIZE = 25;
+	private static final int SQUARE_SIZE = 35;
 	public static int[][] board = new int[BOARD_HEIGHT][BOARD_WIDTH];
 	private Timer timer;
 	private Tetromino currentPiece;
