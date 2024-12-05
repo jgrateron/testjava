@@ -11,22 +11,23 @@ public class PrimeNumbers {
 	public static void main(String[] args) {
 
 		IntFunction<Number> intToNumber = num -> {
-			boolean isPrime = num > 1
-					&& LongStream.rangeClosed(2, Math.round(Math.sqrt(num))).allMatch(n -> num % n != 0);
+			var isPrime = num > 1 && LongStream.rangeClosed(2, Math.round(Math.sqrt(num)))
+					.allMatch(n -> num % n != 0);
 			return new Number(num, isPrime);
 		};
 
 		var listNumbers = IntStream.rangeClosed(1, 100).mapToObj(intToNumber).toList();
 		System.out.println(" " + "-".repeat(50));
 		listNumbers.forEach(n -> {
-			if (n.value % 10 == 1)
+			if (n.value % 10 == 1) {
 				System.out.print("|");
-			var cad = "%5s".formatted(Integer.toString(n.value) + (n.isPrime ? "*" : " "));
+			}
+			var cad = "%4s%s".formatted(n.value, n.isPrime ? "*" : " ");
 			System.out.print(cad);
-			if (n.value % 10 == 0)
+			if (n.value % 10 == 0) {
 				System.out.println("|");
+			}
 		});
 		System.out.println(" " + "-".repeat(50));
 	}
 }
-
