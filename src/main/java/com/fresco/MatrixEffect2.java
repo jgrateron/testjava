@@ -11,7 +11,7 @@ public class MatrixEffect2 extends JPanel implements ActionListener, Runnable {
 	private static final long serialVersionUID = 1L;
 	private static final int WIDTH = 1200;
 	private static final int HEIGHT = 800;
-	private static final int FONT_SIZE = 18;
+	private static final int FONT_SIZE = 14;
 
 	private Random random = new Random();
 	private Column[] matrix;
@@ -131,7 +131,9 @@ public class MatrixEffect2 extends JPanel implements ActionListener, Runnable {
 		frame.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				running = !running;
+				if (e.getKeyChar() == ' ') {
+					running = !running;
+				}
 			}
 		});
 		frame.add(new MatrixEffect2());
