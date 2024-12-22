@@ -12,10 +12,10 @@ public class GzipLineStream {
 
 	public static void main(String[] args) throws IOException {
 		try (var fis = new FileInputStream("lorem.txt.gz")) {
-			gzipLines(fis)
-					.forEach(s -> {
-						System.out.println(s);
-					});
+			var count = gzipLines(fis)
+					.peek(System.out::println)
+					.count();
+			System.out.println("Total lines: %d".formatted(count));
 		}
 	}
 
@@ -26,3 +26,4 @@ public class GzipLineStream {
 		return bufferedReader.lines();
 	}
 }
+
