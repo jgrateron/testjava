@@ -14,7 +14,7 @@ public class AnalogClock extends JPanel {
 
 	public AnalogClock() {
 		// Inicializar el temporizador para actualizar cada segundo
-		timer = new Timer(100, (e) -> {
+		timer = new Timer(250, (e) -> {
 			repaint();
 		});
 		timer.start();
