@@ -28,13 +28,14 @@ class SpacePanel extends JPanel implements ActionListener, KeyListener {
 	private List<Rock> rocks = new ArrayList<>(); // Lista de rocas
 	private Random random = new Random();
 	private final int ROCK_SPAWN_RATE = 120; // Una roca cada 60 frames
-
+	private BufferedImage bufferedImage = new BufferedImage(1000, 800, BufferedImage.TYPE_INT_ARGB);
 	private int framesSinceLastRock = 0;
 
 	public SpacePanel() {
 		setFocusable(true);
 		addKeyListener(this);
 		setBackground(Color.BLACK);
+		setDoubleBuffered(true);
 		timer = new Timer(20, this);
 		timer.start();
 
@@ -61,8 +62,10 @@ class SpacePanel extends JPanel implements ActionListener, KeyListener {
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		Graphics2D g2d = (Graphics2D) g;
-
+		Graphics2D g2d = (Graphics2D) bufferedImage.getGraphics();
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(0, 0, getWidth(), getHeight());
+        
 		// Dibujar el fondo de estrellas
 		starfield.draw(g2d);
 
@@ -82,6 +85,8 @@ class SpacePanel extends JPanel implements ActionListener, KeyListener {
 		for (Rock rock : rocks) {
 			rock.draw(g2d);
 		}
+		Graphics2D g2do = (Graphics2D) g;
+		g2do.drawImage(bufferedImage, 0, 0, null);
 	}
 
 	@Override
@@ -127,9 +132,9 @@ class SpacePanel extends JPanel implements ActionListener, KeyListener {
 		// Crear nuevas rocas
 		framesSinceLastRock++;
 		if (framesSinceLastRock >= ROCK_SPAWN_RATE && rocks.size() < 3) {
-            rocks.add(generateRock());
-            framesSinceLastRock = 0; // Reinicia el contador
-        }
+			rocks.add(generateRock());
+			framesSinceLastRock = 0; // Reinicia el contador
+		}
 
 		// Actualiza si la nave está en movimiento
 		isShipMoving = shipSpeedX != 0 || shipSpeedY != 0;
@@ -174,7 +179,7 @@ class SpacePanel extends JPanel implements ActionListener, KeyListener {
 
 		int rockType = random.nextInt(3); // Genera un tipo de roca aleatorio entre 0 y 2
 
-        return new Rock(startX, startY, size, speedX, speedY, rotationSpeed, color, rockType);
+		return new Rock(startX, startY, size, speedX, speedY, rotationSpeed, color, rockType);
 	}
 
 	@Override

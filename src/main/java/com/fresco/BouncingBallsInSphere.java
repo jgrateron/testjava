@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -26,12 +27,12 @@ public class BouncingBallsInSphere extends JPanel implements ActionListener {
     
     // Timer para controlar la frecuencia de actualización de la animación (~30 FPS)
     private Timer timer;
-
+    private BufferedImage bufferedImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
+    
     // Constructor de la clase. Inicializa el panel, crea las bolas y comienza el temporizador.
     public BouncingBallsInSphere() {
         setPreferredSize(new Dimension(WIDTH, HEIGHT)); // Establece el tamaño preferido del panel
         setBackground(Color.BLACK); // Fondo negro para un mejor contraste visual
-        setDoubleBuffered(true); // Habilita el doble buffer para evitar parpadeos durante la animación
         
         Random random = new Random(); // Generador de números aleatorios para posiciones y velocidades iniciales
         
@@ -72,8 +73,9 @@ public class BouncingBallsInSphere extends JPanel implements ActionListener {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g); // Llama al método de la clase padre para limpiar el panel
-        Graphics2D g2d = (Graphics2D) g;
-        
+        Graphics2D g2d = (Graphics2D) bufferedImage.getGraphics();
+		g2d.setColor(Color.BLACK);
+		g2d.fillRect(0, 0, getWidth(), getHeight());
         // Habilitar antialiasing para mejorar la calidad visual de las líneas y círculos
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -92,6 +94,8 @@ public class BouncingBallsInSphere extends JPanel implements ActionListener {
             // Dibujar la bola como un círculo lleno
             g2d.fillOval(px - BALL_RADIUS, py - BALL_RADIUS, BALL_RADIUS * 2, BALL_RADIUS * 2);
         }
+		Graphics2D g2do = (Graphics2D) g;
+		g2do.drawImage(bufferedImage, 0, 0, null);
     }
 
     // Método para dibujar la malla de la esfera
@@ -183,7 +187,7 @@ public class BouncingBallsInSphere extends JPanel implements ActionListener {
 
     // Método para actualizar la posición de las bolas y manejar colisiones con la esfera
     private void updateBalls() {
-        rotationAngle += 0.01; // Incrementar el ángulo de rotación para dar efecto de giro
+        rotationAngle += 0.02; // Incrementar el ángulo de rotación para dar efecto de giro
 
         for (Ball ball : balls) {
             // Actualizar la posición de la bola según su velocidad

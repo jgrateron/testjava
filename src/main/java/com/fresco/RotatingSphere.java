@@ -1,25 +1,40 @@
 package com.fresco;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.Timer;
+
 public class RotatingSphere extends JPanel implements ActionListener {
+	private static final long serialVersionUID = 6354859460495822461L;
 	private static final int WIDTH = 800;
 	private static final int HEIGHT = 600;
 	private static final int SPHERE_RADIUS = 250;
-	private static final int POINT_COUNT = 500;
-	private static final double ROTATION_SPEED = 0.01;
+	private static final int POINT_COUNT = 2500;
+	private static final double ROTATION_SPEED = 0.02;
 	private final Random random = new Random(); // Generador de números aleatorios
-	private char[] LETTERS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+	//private char[] LETTERS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+	private char[] LETTERS = { '*', '*'};
+	// private char[] LETTERS = { '.' };
 
-	private List<Point3D> points = new ArrayList<>();
-
+	private List<Point3D> points = new ArrayList<Point3D>();
 	private double angleY = 0; // Solo rotación en el eje Y
+	private Font font = new Font("Monospaced", Font.BOLD, 14);
+	private List<Point2D> pointsBack = new ArrayList<Point2D>();
+	private List<Point2D> pointsFront = new ArrayList<Point2D>();
+
+	private BufferedImage bufferedImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
 
 	public RotatingSphere() {
 		// Generar puntos fijos en la superficie de la esfera
@@ -29,31 +44,27 @@ public class RotatingSphere extends JPanel implements ActionListener {
 			double x = SPHERE_RADIUS * Math.sin(phi) * Math.cos(theta);
 			double y = SPHERE_RADIUS * Math.sin(phi) * Math.sin(theta);
 			double z = SPHERE_RADIUS * Math.cos(phi);
-
 			points.add(new Point3D(x, y, z, Character.toString(LETTERS[random.nextInt(LETTERS.length)])));
 		}
-		setDoubleBuffered(true);
+		// setDoubleBuffered(true);
 		// Configurar el temporizador para la animación
-		Timer timer = new Timer(16, this); // ~60 FPS
+		Timer timer = new Timer(33, this); // ~60 FPS
 		timer.start();
 	}
 
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		Graphics2D g2d = (Graphics2D) g;
+		Graphics2D g2d = (Graphics2D) bufferedImage.getGraphics();
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		// Establecer el fondo negro
 		g2d.setColor(Color.BLACK);
 		g2d.fillRect(0, 0, getWidth(), getHeight());
 
 		// Configurar fuente y color para los números
-		g2d.setFont(new Font("Monospaced", Font.BOLD, 14));
-		List<Point2D> pointsBack = new ArrayList<>();
-		List<Point2D> pointsFront = new ArrayList<>();
+		g2d.setFont(font);
 		// Proyectar y dibujar cada punto
 		for (Point3D point : points) {
-			// Rotar el punto alrededor del eje Y
 			double rotatedX = point.x * Math.cos(angleY) - point.z * Math.sin(angleY);
 			double rotatedZ = point.x * Math.sin(angleY) + point.z * Math.cos(angleY);
 			double rotatedY = point.y; // No hay rotación en el eje X
@@ -62,10 +73,11 @@ public class RotatingSphere extends JPanel implements ActionListener {
 			double scale = 500 / (500 + rotatedZ);
 			int projectedX = (int) (rotatedX * scale + WIDTH / 2);
 			int projectedY = (int) (rotatedY * scale + HEIGHT / 2);
+			Point2D point2d = new Point2D(projectedX, projectedY, point.t);
 			if (rotatedZ >= 0) {
-				pointsBack.add(new Point2D(projectedX, projectedY, point.t));
+				pointsBack.add(point2d);
 			} else {
-				pointsFront.add(new Point2D(projectedX, projectedY, point.t));
+				pointsFront.add(point2d);
 			}
 		}
 		g2d.setColor(Color.GRAY);
@@ -76,6 +88,10 @@ public class RotatingSphere extends JPanel implements ActionListener {
 		for (Point2D point : pointsFront) {
 			g2d.drawString(point.t, point.x, point.y);
 		}
+		pointsBack.clear();
+		pointsFront.clear();
+		Graphics2D g2do = (Graphics2D) g;
+		g2do.drawImage(bufferedImage, 0, 0, null);
 	}
 
 	@Override
