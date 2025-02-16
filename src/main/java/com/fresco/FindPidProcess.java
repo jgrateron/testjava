@@ -1,6 +1,7 @@
 package com.fresco;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -10,7 +11,7 @@ public class FindPidProcess {
 		try {
 			return Files.readString(path);
 		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage());
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -22,7 +23,7 @@ public class FindPidProcess {
 					.map(content -> content.contains(nameProcess))
 					.findFirst().orElse(false);
 		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage());
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -38,4 +39,3 @@ public class FindPidProcess {
 		System.out.println("Total: " + listProcess.size());
 	}
 }
-
